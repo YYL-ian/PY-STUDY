@@ -15,6 +15,7 @@ data = []
 colunms = ["用户", "名字", "标题"]  #列名
 tmp = ["张同学", "张晚意", "pd生成excel"]
 
+
 #重复读入样本
 for t in range(10):
     data.append(tmp)
@@ -22,6 +23,7 @@ for t in range(10):
 type(data)  #生成列表
 data_df = pd.DataFrame(data, columns=colunms, index=[x+1 for x in range(10)])  # 转换为数据框
 data_df
+data_df.columns.to_list()
 
 
 #方2
@@ -31,13 +33,25 @@ data_df2 = pd.DataFrame({"one":['2023-01','2023-02','2023-03'],\
 data_df2
 
 
+#列表生成式
+[x for x in range(10)]
+
+
 
 # 1.读入读出excel
 data1=pd.read_excel(r'D:\服务相关\数据源\6.每月绩效\data_gwy.xlsx', dtype={'用户编号':'str'}) #读入数据
 data1.dtypes
 
-data2=data1.groupby(by=['用户编号'],as_index=False).agg({'看课进度10%节数':'sum','课节总数(正式课节+赠课课节)':'sum'})   #分组汇总
+
+# 分组汇总
+data2=data1.groupby(by=['用户编号'],as_index=False).agg({'看课进度10%节数':'sum','课节总数(正式课节+赠课课节)':'sum'})   
 data2.columns
+
+
+# 数据透视表
+data2_2 = pd.pivot_table(data1,values=['正式课节总数','正式课节看课进度10%节数'],index='用户编号',aggfunc=np.sum,fill_value=0)
+data2_2.reset_index(drop=False)
+
 
 cols_watch=['用户id','看课节数','总课节数']
 data2.columns=cols_watch     #变量重命名
@@ -218,6 +232,25 @@ da1[da1['user_type'].str.contains('新用户')]
 
 
 
+Table = pd.DataFrame({'date': ['2019/6/1', '2019/7/2', '2019/6/6', '2019/6/17', '2019/7/4', '2019/6/13', '2019/6/14', '2019/6/21', '2019/6/17'], \
+    'order_id': [i+1 for i in range(9)],
+    'commodity_code': ['S1', 'S2', 'S3', 'S5', 'S5', 'S2', 'S9', 'S11', 'S9'], \
+    'commodity_name': ['标准美式','瑞纳冰', '加浓美式', '拿铁', '拿铁', '瑞纳冰', '菠萝卷', '坚果', '菠萝卷'], \
+    'category_name': ['饮品', '饮品', '饮品', '饮品', '饮品', '饮品', '食品', '食品', '食品']})
+
+Table.columns.to_list()
+
+#过滤出购买超过一单的商品对应的所有订单信息
+temp = Table.groupby('commodity_code')['commodity_code'].count()
+temp[temp>1].index
+
+Table[Table['commodity_code'].isin(temp[temp>1].index)]
+
+
+
+
+
+
 
 # 2.删除不需要的行列
 da_drop = pd.DataFrame(np.arange(12).reshape(3, 4),columns=['A', 'B', 'C', 'D'])
@@ -307,7 +340,7 @@ da_gb.groupby(col_gb, as_index=False).max()  #分组字段不会被设为索引�
 da_gb.groupby(['Animal'], as_index=False).max()
 
 
-# set_index() 和 reset_index()用来指定、还原索引
+# df.set_index(keys)--将keys列指定为索引；reset_index()用来还原索引
 da_gb.reset_index(drop=False)  #会保留索引列
 
 da1.groupby(['user_type']).agg({'user_number':'unique'}).reset_index()  #返回一个去重的列表
