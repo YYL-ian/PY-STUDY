@@ -7,34 +7,40 @@ import os
 import datetime
 
 
-# 创建数据集
+########################## 230509 version1 ########################
+
+# 0.创建数据集
+#方1
 data = []
-colunms = ["用户", "名字", "标题"]
+colunms = ["用户", "名字", "标题"]  #列名
 tmp = ["张同学", "张晚意", "pd生成excel"]
+
+#重复读入样本
 for t in range(10):
-    data.append(tmp)  
-df = pd.DataFrame(data, columns=colunms, index=[x+1 for x in range(10)])  # 生成测试数据框
-df
+    data.append(tmp)
 
-t = datetime.datetime.now().date()-datetime.timedelta(days=1)  # 昨日
+type(data)  #生成列表
+data_df = pd.DataFrame(data, columns=colunms, index=[x+1 for x in range(10)])  # 转换为数据框
+data_df
 
 
-'''
-dat={"one":['2023-01','2023-02','2023-03'],\
+#方2
+data_df2 = pd.DataFrame({"one":['2023-01','2023-02','2023-03'],\
     "two":np.linspace(1,3,3),\
-    "three":np.arange(3)}
-dat2 = pd.DataFrame(dat, index=[1,2,3])
-'''
+    "three":np.arange(3)})
+data_df2
+
+
 
 # 1.读入读出excel
 data1=pd.read_excel(r'D:\服务相关\数据源\6.每月绩效\data_gwy.xlsx', dtype={'用户编号':'str'}) #读入数据
 data1.dtypes
 
-data2=data1.groupby(by=['用户编号'],as_index=False).agg({'看课进度10%节数':'sum','课节总数(正式课节+赠课课节)':'sum'})
+data2=data1.groupby(by=['用户编号'],as_index=False).agg({'看课进度10%节数':'sum','课节总数(正式课节+赠课课节)':'sum'})   #分组汇总
 data2.columns
 
 cols_watch=['用户id','看课节数','总课节数']
-data2.columns=cols_watch
+data2.columns=cols_watch     #变量重命名
 data2.dtypes
 
 
@@ -53,20 +59,12 @@ with pd.ExcelWriter(r'D:\代码\test\test_watch2.xlsx') as writer2:
 
 
 
+
 # 2.批量处理excel
 # 获取文件集合
-path='D:\\代码\\test\\功底测test\\' #批量处理excel所在文件夹路径
+path='D:\\代码\\test\\功底测test\\' #批量处理excel所在的文件夹路径
 filename = os.listdir(path)   #获取该文件夹目录下的文件
 filename
-
-'''
-df = pd.read_excel(path+filename[0]) #表探查
-df.dropna(how='all',axis=1,inplace=True)  #删除全为空的列(all在所有值为空时删除，any在任何值为空时删除该列)
-
-bins=[0,89,200]
-df['if_pass'] = pd.cut(df['8月功底测分数'],bins,labels=['不及格','及格'],include_lowest=True)
-df
-'''
 
 
 # 创建循环，遍历读入每一个Excel文件
@@ -79,7 +77,6 @@ for i in range(len(filename)):
     print(filename[i].split('.')[0]+'************文件处理成功')
 
 
-# 获取指定目录下全部excel文件名
 
 # root获取所有文件夹路径
 for root,dirs,files in os.walk('D:\\服务相关\\数据源\\2.2NPS名单'):
@@ -87,13 +84,15 @@ for root,dirs,files in os.walk('D:\\服务相关\\数据源\\2.2NPS名单'):
     for file in files:
         print(file)
 
-# 批量合并同一文件夹下的所有excel文件
+
+# 2.1批量合并同一文件夹下的所有excel文件
 filelist=[]
 for root,dirs,files in os.walk('D:\\服务相关\\数据源\\2.NPS'):   
     for file in files:
         if file.endswith('xlsx'):
             filelist.append(os.path.join(root,file))
 filelist
+
 
 writer3=pd.ExcelWriter('D:\\代码\\test\\test_write.xlsx')
 for file in filelist:
@@ -142,37 +141,36 @@ https://blog.csdn.net/qq_45219614/article/details/126002629  设置格式
 '''
 
 
-# pandas
+
+# 4.pandas数据处理
 da1=pd.read_excel(r'D:\代码\test\test.xlsx')
 da1
 
 
 # 0.数据集基本信息查看
 type(da1)
-da1.index  #返回索引
-da1.columns  #返回所有列
 type(da1.values)
+da1.index       #返回索引
+da1.columns     #返回所有列名
 da1.describe()  #对数值列统计
 da1.info
 
 da1.shape    #查看数据框结构
-da1.dtypes   #用户编号是数值型，也可在读入数据时设置
+da1.dtypes   #查看列类型，也可在读入数据时设置
 
 
-'''
-da1['user_number']=da1['user_number'].astype('str')
+# 0.1 列类型转换astype
+da1['user_number']=da1['user_number'].astype('str')  
 da1.dtypes
-'''
 
 da2=pd.read_excel(r'D:\代码\test\test.xlsx',dtype={'user_number':str})
 da2.dtypes
 
 
+
 # 1.筛选行列
 da1.head(5)
 da1.shape 
-
-
 
 # 1.1提取需要的行列
 # 根据index/&列名提取行列--loc
@@ -296,7 +294,7 @@ dts[0].dt.month     #多个日期时需要用dt
 dt1.strftime('%Y-%m-%d')     
 dts[0].strftime('%Y-%m-%d') 
 
-
+t = datetime.datetime.now().date()-datetime.timedelta(days=1)  # 昨日
 
 
 # 6.分组统计group by 
