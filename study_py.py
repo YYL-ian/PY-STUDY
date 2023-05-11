@@ -389,3 +389,12 @@ data_re = data1.pivot_table(index=['班级编号','班级名称'],aggfunc={'assi
 pattern = re.compile(r"[\u4e00-\u9fa5]")
 
 pattern.findall(data_re['班级名称'][0])
+
+
+
+
+# series
+# from pandas import Serise,DataFrame 
+se1 = pd.Series([1,4])
+se1.values
+se1.index
