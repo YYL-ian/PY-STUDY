@@ -39,7 +39,9 @@ data_df2
 
 
 # 1.读入读出excel
-data1=pd.read_excel(r'D:\服务相关\数据源\6.每月绩效\data_gwy.xlsx', dtype={'用户编号':'str'}) #读入数据
+data1=pd.read_excel(r'D:\服务相关\数据源\6.每月绩效\data_gwy.xlsx', dtype={'用户编号':'str'}) 
+#读入数据 names设置列名,usecols选择需要的列,nrows设置读入文件行数,parse_dates将某列指定为时间类型,iterator=True，分块读入数据，df.get_chunk(n)
+
 data1.dtypes
 
 
@@ -377,3 +379,13 @@ df_join2
 
 
 
+
+
+# 正则
+import re
+data1['assi']=1
+data_re = data1.pivot_table(index=['班级编号','班级名称'],aggfunc={'assi':sum}).reset_index(drop=False)
+
+pattern = re.compile(r"[\u4e00-\u9fa5]")
+
+pattern.findall(data_re['班级名称'][0])
