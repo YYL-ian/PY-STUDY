@@ -9,35 +9,6 @@ import datetime
 
 ########################## 230509 version1 ########################
 
-# 0.创建数据集
-#方1
-data = []
-colunms = ["用户", "名字", "标题"]  #列名
-tmp = ["张同学", "张晚意", "pd生成excel"]
-
-
-#重复读入样本
-for t in range(10):
-    data.append(tmp)
-
-type(data)  #生成列表
-data_df = pd.DataFrame(data, columns=colunms, index=[x+1 for x in range(10)])  # 转换为数据框
-data_df
-data_df.columns.to_list()
-
-
-#方2
-data_df2 = pd.DataFrame({"one":['2023-01','2023-02','2023-03'],\
-    "two":np.linspace(1,3,3),\
-    "three":np.arange(3)})
-data_df2
-
-
-#列表生成式
-[x for x in range(10)]
-
-
-
 # 1.读入读出excel
 data1=pd.read_excel(r'D:\服务相关\数据源\6.每月绩效\data_gwy.xlsx', dtype={'用户编号':'str'}) 
 #读入数据 names设置列名,usecols选择需要的列,nrows设置读入文件行数,parse_dates将某列指定为时间类型,iterator=True，分块读入数据，df.get_chunk(n)
@@ -163,77 +134,9 @@ da1=pd.read_excel(r'D:\代码\test\test.xlsx')
 da1
 
 
-# 0.数据集基本信息查看
-type(da1)
-type(da1.values)
-da1.index       #返回索引
-da1.columns     #返回所有列名
-da1.describe()  #对数值列统计
-da1.info
-
-da1.shape    #查看数据框结构
-da1.dtypes   #查看列类型，也可在读入数据时设置
-
-
-# 0.1 列类型转换astype
-da1['user_number']=da1['user_number'].astype('str')  
-da1.dtypes
-
-da2=pd.read_excel(r'D:\代码\test\test.xlsx',dtype={'user_number':str})
-da2.dtypes
-
-
 
 # 1.筛选行列
-da1.head(5)
-da1.shape 
-
-# 1.1提取需要的行列
-# 根据index/&列名提取行列--loc
-da1.loc[1]  #提取一行返回series
-da1.loc[:5]  #闭区间
-da1.loc[[1,3]]  #提取不相邻的行要输入list
-
-da1.loc[:,['paid_date','user_type']]  #loc中根据列名提取指定列
-
-
-# 根据绝对位置提取行列--iloc
-da1.iloc[:,1]  # 提取第二列
-da1.iloc[1:5,:]   # 左开右闭区间
-da1.iloc[0:6,[0,3]]   # 根据位置提取指定列
-
-
-# 直接根据列名提取列
-da1[['paid_date','user_type']]
-
-
-# 根据绝对位置提取行
-da1[0:6]
-
-
-
-## 1.2条件筛选
-da1[da1['user_type']=='纯新用户']  #直接筛选
-
-new_in = da1[da1['user_type']=='纯新用户'].index
-da1.iloc[new_in]     #通过条件行的索引筛选
-da1.drop(new_in)
-
-
-# 1.3多条件筛选
-da1['user_type']
-types=['纯新用户','私域新用户']
-da1['user_type'].isin(types)   #返回索引行逻辑判断
-da3=da1[da1['user_type'].isin(types)]
-da3
-
-da3.sort_values(by='user_type', ascending=False, na_position='first')
-
-da1[da1['user_type'].str.contains('新用户')]
-
-
-
-
+## 多条件筛选
 Table = pd.DataFrame({'date': ['2019/6/1', '2019/7/2', '2019/6/6', '2019/6/17', '2019/7/4', '2019/6/13', '2019/6/14', '2019/6/21', '2019/6/17'], \
     'order_id': [i+1 for i in range(9)],
     'commodity_code': ['S1', 'S2', 'S3', 'S5', 'S5', 'S2', 'S9', 'S11', 'S9'], \
@@ -243,12 +146,20 @@ Table = pd.DataFrame({'date': ['2019/6/1', '2019/7/2', '2019/6/6', '2019/6/17', 
 Table.columns.to_list()
 
 #过滤出购买超过一单的商品对应的所有订单信息
-temp = Table.groupby('commodity_code')['commodity_code'].count()
+temp = Table.groupby('commodity_code')['commodity_code'].count()  #分组计数法
 temp[temp>1].index
 
 Table[Table['commodity_code'].isin(temp[temp>1].index)]
 
 
+## pandas的value_counts()函数法
+multi = Table['commodity_name'].value_counts()>1
+type(multi)
+
+multi[multi].index
+
+
+Table[Table['commodity_name'].isin(multi[multi].index)]
 
 
 
