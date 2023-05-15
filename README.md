@@ -1,2 +1,0 @@
-# PY-STUDY
-hhh=100
