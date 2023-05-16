@@ -5,37 +5,10 @@ import pandas as pd
 import numpy as np
 import os
 import datetime
+from openpyxl import load_workbook
 
 
-########################## 230509 version1 ########################
-
-# 0.创建数据集
-#方1
-data = []
-colunms = ["用户", "名字", "标题"]  #列名
-tmp = ["张同学", "张晚意", "pd生成excel"]
-
-
-#重复读入样本
-for t in range(10):
-    data.append(tmp)
-
-type(data)  #生成列表
-data_df = pd.DataFrame(data, columns=colunms, index=[x+1 for x in range(10)])  # 转换为数据框
-data_df
-data_df.columns.to_list()
-
-
-#方2
-data_df2 = pd.DataFrame({"one":['2023-01','2023-02','2023-03'],\
-    "two":np.linspace(1,3,3),\
-    "three":np.arange(3)})
-data_df2
-
-
-#列表生成式
-[x for x in range(10)]
-
+##################################################
 
 
 # 1.读入读出excel
@@ -60,6 +33,7 @@ data2.columns=cols_watch     #变量重命名
 data2.dtypes
 
 
+
 # 读出到同一excel不同sheet页
 #### 方法1
 writer = pd.ExcelWriter(r'D:\代码\test\test_watch.xlsx')
@@ -72,6 +46,54 @@ with pd.ExcelWriter(r'D:\代码\test\test_watch2.xlsx') as writer2:
     data1.to_excel(writer2, sheet_name='data', na_rep='', index=False)
     data2.to_excel(writer2, sheet_name='学员完课汇总', index=False)
 
+
+
+
+# 向已有excel中追加数据##############################################
+os.chdir('D:\\代码\\test')
+
+s1 = pd.DataFrame(np.array([['s1', 's1', 's1', 's1']]), columns=['a', 'b', 'c', 'd'])
+s2 = pd.DataFrame(np.array([['s2', 's2', 's2', 's2']]), columns=['a', 'b', 'c', 'd'])
+# s4 只有3列,并且列顺序被打乱,以模拟新数据与元数据的差异
+s4 = pd.DataFrame(np.array([['s4b', 's4d', 's4c']]), columns=['b', 'd', 'c'])
+
+with pd.ExcelWriter("test_append.xlsx") as writer:
+    # 先写入两个sheet
+    s1.to_excel(writer, sheet_name="111", index=False)
+    s2.to_excel(writer, sheet_name="222", index=False)
+
+
+# 读入excel
+df = pd.read_excel('test_append.xlsx', sheet_name='111')
+row = df.shape[0]	# 获取原数据的行数
+
+s4 = pd.concat([pd.DataFrame(columns=df.columns), s4], ignore_index=True)  # 将新数据格式化成原数据的模样,以解决数据列之间的差异
+s4
+
+
+# 将s4数据写入excel的第一个工作表中
+
+book = load_workbook("test_append.xlsx")      #加载excel文件
+
+book.active               #获取当前活动的工作表,默认最后关闭时的sheet
+book.worksheets           #获取全部工作表
+book.get_sheet_names()    #获取全部sheet名
+
+writer = pd.ExcelWriter("D:\\代码\\test\\test_append.xlsx", engine='openpyxl')
+
+writer = pd.ExcelWriter("D:\\代码\\test\\test_append.xlsx")
+writer.book = book
+writer.sheets = {sheet.title: sheet for sheet in book.worksheets}
+s4.to_excel(writer, sheet_name='111', startrow=row + 1, index=False, header=False)
+writer.close()
+
+with pd.ExcelWriter("test_append.xlsx",engine='openxl') as writer:
+    writer.book = book
+    writer.sheets = {sheet.title: sheet for sheet in book.worksheets}
+    # 追加新数据,追加前必须先格式化新数据,否则新数据缺少列,或是列顺序不对会导致数据紊乱
+    s4.to_excel(writer, sheet_name='111', startrow=row + 1, index=False, header=False)
+
+###############################################
 
 
 
@@ -119,7 +141,7 @@ writer3.close()
 
 
 
-# 3.调整excel格式  
+# 3.调整excel格式 ################################# 
 data2.head()
 data2.shape
 
@@ -159,80 +181,9 @@ https://blog.csdn.net/qq_45219614/article/details/126002629  设置格式
 
 
 # 4.pandas数据处理
-da1=pd.read_excel(r'D:\代码\test\test.xlsx')
-da1
 
-
-# 0.数据集基本信息查看
-type(da1)
-type(da1.values)
-da1.index       #返回索引
-da1.columns     #返回所有列名
-da1.describe()  #对数值列统计
-da1.info
-
-da1.shape    #查看数据框结构
-da1.dtypes   #查看列类型，也可在读入数据时设置
-
-
-# 0.1 列类型转换astype
-da1['user_number']=da1['user_number'].astype('str')  
-da1.dtypes
-
-da2=pd.read_excel(r'D:\代码\test\test.xlsx',dtype={'user_number':str})
-da2.dtypes
-
-
-
-# 1.筛选行列
-da1.head(5)
-da1.shape 
-
-# 1.1提取需要的行列
-# 根据index/&列名提取行列--loc
-da1.loc[1]  #提取一行返回series
-da1.loc[:5]  #闭区间
-da1.loc[[1,3]]  #提取不相邻的行要输入list
-
-da1.loc[:,['paid_date','user_type']]  #loc中根据列名提取指定列
-
-
-# 根据绝对位置提取行列--iloc
-da1.iloc[:,1]  # 提取第二列
-da1.iloc[1:5,:]   # 左开右闭区间
-da1.iloc[0:6,[0,3]]   # 根据位置提取指定列
-
-
-# 直接根据列名提取列
-da1[['paid_date','user_type']]
-
-
-# 根据绝对位置提取行
-da1[0:6]
-
-
-
-## 1.2条件筛选
-da1[da1['user_type']=='纯新用户']  #直接筛选
-
-new_in = da1[da1['user_type']=='纯新用户'].index
-da1.iloc[new_in]     #通过条件行的索引筛选
-da1.drop(new_in)
-
-
-# 1.3多条件筛选
-da1['user_type']
-types=['纯新用户','私域新用户']
-da1['user_type'].isin(types)   #返回索引行逻辑判断
-da3=da1[da1['user_type'].isin(types)]
-da3
-
-da3.sort_values(by='user_type', ascending=False, na_position='first')
-
-da1[da1['user_type'].str.contains('新用户')]
-
-
-
+# 4.1.筛选行列
+## 多条件筛选
 
 Table = pd.DataFrame({'date': ['2019/6/1', '2019/7/2', '2019/6/6', '2019/6/17', '2019/7/4', '2019/6/13', '2019/6/14', '2019/6/21', '2019/6/17'], \
     'order_id': [i+1 for i in range(9)],
@@ -249,12 +200,19 @@ temp[temp>1].index
 Table[Table['commodity_code'].isin(temp[temp>1].index)]
 
 
+# 4.2.pandas的value_counts()函数法
+multi = Table['commodity_name'].value_counts()>1
+type(multi)
+
+multi[multi].index
+
+
+Table[Table['commodity_name'].isin(multi[multi].index)]
 
 
 
 
-
-# 2.删除不需要的行列
+# 4.3.删除不需要的行列
 da_drop = pd.DataFrame(np.arange(12).reshape(3, 4),columns=['A', 'B', 'C', 'D'])
 da_drop
 
@@ -262,12 +220,12 @@ da_drop.drop(["C","A"], axis=1, inplace=False)   #删除多列
 da_drop.drop(0)  #删除行，axis默认是0
  
 
-# 2.1删除重复值
+# 4.4.删除重复值
 da4 = da1[['paid_date','user_type']].drop_duplicates()
 da4.shape
 
 
-# 2.2删除有NaN值的行列
+# 4.5删除有NaN值的行列
 import numpy as np 
 da = pd.DataFrame({"name": ['Alfred', 'Batman', 'Catwoman'],\
     "toy": [np.nan, 'Batmobile', 'Bullwhip'],\
@@ -281,7 +239,7 @@ da.dropna(subset=["toy","born"],how="all")
 
 
 
-# 3.重命名
+# 4.6.重命名
 da1.columns
 
 da5=da1.rename(columns={"final_paid_timestamp":"paid_timestamp","user_type":"type"})
@@ -296,7 +254,7 @@ da5.head()
 
 
 
-# 4.改变列顺序
+# 4.7.改变列顺序
 da1
 pd.DataFrame(da1,columns=['user_type','user_number','paid_date'])
 
@@ -313,7 +271,7 @@ da1_change
 
 
 
-# 5.日期处理相关
+# 4.8.日期处理相关
 dt1 = pd.to_datetime('2022-05-10')
 dt1.month         #只有一个日期不需要用.dt
 
@@ -332,7 +290,7 @@ dts[0].strftime('%Y-%m-%d')
 t = datetime.datetime.now().date()-datetime.timedelta(days=1)  # 昨日
 
 
-# 6.分组统计group by 
+# 4.9.分组统计group by 
 da_gb = pd.DataFrame({'Animal': ['Falcon', 'Falcon', 'Parrot', 'Parrot'], 'Max Speed': [380., 370., 24., 26.]})
 da_gb
 
@@ -360,7 +318,7 @@ da1
 
 
 
-# 7.数据框合并 pd.concat() axis=1表示左右合并
+# 4.10.数据框合并 pd.concat() axis=1表示左右合并
 
 df1=pd.DataFrame({"A":np.arange(10)})
 df1
@@ -375,13 +333,13 @@ df_join2=pd.concat([df1,df2],ignore_index=True)  #会更新index
 df_join2
 
 
-# 8.数据集合并 merge
+# 4.11.数据集合并 merge
 
 
 
 
 
-# 正则
+# 5.正则
 import re
 data1['assi']=1
 data_re = data1.pivot_table(index=['班级编号','班级名称'],aggfunc={'assi':sum}).reset_index(drop=False)
