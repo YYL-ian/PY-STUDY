@@ -181,10 +181,13 @@ https://blog.csdn.net/qq_45219614/article/details/126002629  设置格式
 
 
 # 4.pandas数据处理
+da1=pd.read_excel(r'D:\代码\test\test.xlsx')
+da1
 
-# 4.1.筛选行列
+
+
+# 1.筛选行列
 ## 多条件筛选
-
 Table = pd.DataFrame({'date': ['2019/6/1', '2019/7/2', '2019/6/6', '2019/6/17', '2019/7/4', '2019/6/13', '2019/6/14', '2019/6/21', '2019/6/17'], \
     'order_id': [i+1 for i in range(9)],
     'commodity_code': ['S1', 'S2', 'S3', 'S5', 'S5', 'S2', 'S9', 'S11', 'S9'], \
@@ -194,7 +197,7 @@ Table = pd.DataFrame({'date': ['2019/6/1', '2019/7/2', '2019/6/6', '2019/6/17', 
 Table.columns.to_list()
 
 #过滤出购买超过一单的商品对应的所有订单信息
-temp = Table.groupby('commodity_code')['commodity_code'].count()
+temp = Table.groupby('commodity_code')['commodity_code'].count()  #分组计数法
 temp[temp>1].index
 
 Table[Table['commodity_code'].isin(temp[temp>1].index)]
