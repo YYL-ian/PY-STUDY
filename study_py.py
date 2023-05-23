@@ -14,11 +14,13 @@ from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl import load_workbook
 
+da_test=pd.DataFrame([['one','two'],['three','four']],columns=['hi','no'])
+
 book = load_workbook('D:/市场看板/市场/1.转化数据汇总/test.xlsx')
 
-new_sheet = book.create_sheet(title=week)
+new_sheet = book.create_sheet(title='new')
 
-rows = dataframe_to_rows(final,index=False,header=True)
+rows = dataframe_to_rows(da_test,index=False,header=True)
 
 for r_idx, row in enumerate(rows, 1):
     for c_idx, value in enumerate(row, 1):
@@ -34,7 +36,7 @@ from openpyxl import load_workbook
 
 book = load_workbook('D:/项目/事业单位-联报单科(YH项目看板).xlsx')
 sheet = book.active
-rows = dataframe_to_rows(data2,index=False,header=False)
+rows = dataframe_to_rows(da_test,index=False,header=False)
 
 for r_idx, row in enumerate(rows, sheet.max_row + 1):
     for c_idx, value in enumerate(row, 1):
