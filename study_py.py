@@ -7,6 +7,72 @@ import os
 import datetime
 from openpyxl import load_workbook
 
+#####################  230523  #############################
+
+# 添加dataframe类型数据至新建sheet页
+
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl import load_workbook
+
+book = load_workbook('D:/市场看板/市场/1.转化数据汇总/test.xlsx')
+
+new_sheet = book.create_sheet(title=week)
+
+rows = dataframe_to_rows(final,index=False,header=True)
+
+for r_idx, row in enumerate(rows, 1):
+    for c_idx, value in enumerate(row, 1):
+        new_sheet.cell(row=r_idx, column=c_idx, value=value)
+
+book.save('D:/市场看板/市场/1.转化数据汇总/test.xlsx')
+
+
+
+# 将结果追加写入已有excel
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl import load_workbook
+
+book = load_workbook('D:/项目/事业单位-联报单科(YH项目看板).xlsx')
+sheet = book.active
+rows = dataframe_to_rows(data2,index=False,header=False)
+
+for r_idx, row in enumerate(rows, sheet.max_row + 1):
+    for c_idx, value in enumerate(row, 1):
+        sheet.cell(row=r_idx, column=c_idx, value=value)
+
+
+
+
+# 添加数组类型数据至已有sheet页
+import openpyxl
+workbook = openpyxl.load_workbook('D:/市场看板/市场/1.转化数据汇总/0515期_事业单&公务员位转化数据_汇总.xlsx')
+sheet = workbook.active
+
+datas = [['lucas','28','m'],['emma','22','f']]   
+for data in datas:
+    sheet.append(data)
+
+workbook.save('D:/市场看板/市场/1.转化数据汇总/0515期_事业单&公务员位转化数据_汇总.xlsx')
+
+
+
+# 添加dataframe类型数据至已有sheet页
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl import load_workbook
+workbook = load_workbook('D:/市场看板/市场/1.转化数据汇总/test.xlsx')
+sheet = workbook.active
+
+new_data=pd.DataFrame({'name':['test','test','test']})
+rows = dataframe_to_rows(new_data,index=False,header=True)
+
+for r_idx, row in enumerate(rows, sheet.max_row + 1):
+    for c_idx, value in enumerate(row, 1):
+        sheet.cell(row=r_idx, column=c_idx, value=value)
+
+workbook.save('D:/市场看板/市场/1.转化数据汇总/test.xlsx')
+
+
+
 
 ##################################################
 
