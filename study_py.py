@@ -14,11 +14,17 @@ from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl import load_workbook
 
+#load_workbook将excel文件加载至内存中，对其数据进行：读取/修改单元格内容、创建新的sheet页
+load_workbook
+
 da_test=pd.DataFrame([['one','two'],['three','four']],columns=['hi','no'])
 
 book = load_workbook('D:/市场看板/市场/1.转化数据汇总/test.xlsx')
 
-new_sheet = book.create_sheet(title='new')
+sheet_cu = book.active
+sheet_cu['A1'].value  #读取A1单元格内容
+
+new_sheet = book.create_sheet(title='new')  #创建sheet页
 
 rows = dataframe_to_rows(da_test,index=False,header=True)
 
@@ -389,23 +395,35 @@ da1
 
 
 
-# 4.10.数据框合并 pd.concat() axis=1表示左右合并
+# 7.数据框合并 
+df11=pd.DataFrame({"A":np.arange(10)})
+df11
 
-df1=pd.DataFrame({"A":np.arange(10)})
-df1
+df22=pd.DataFrame([7,8],columns=["A"])
+df22
 
-df2=pd.DataFrame([7,8],columns=["A"])
-df2
-
-df_join=pd.concat([df1,df2])
-df_join
-
-df_join2=pd.concat([df1,df2],ignore_index=True)  #会更新index
-df_join2
+pd.concat([df11,df22])   #pd.concat只是数据框的拼接
+pd.concat([df11,df22],ignore_index=True)  #会更新index
 
 
-# 4.11.数据集合并 merge
 
+df1 = pd.DataFrame([[1,2,3],['a','b','c']],columns=['T','Y','U'])
+df2 = pd.DataFrame([[0,2,4],['a','b','m']],columns=['T','Y','I'])
+
+
+# 将两个数据框根据行轴/列轴拼接在一起
+pd.concat([df1,df2])
+pd.concat([df1,df2],axis=1)  
+
+
+# 将两个数据库根据指定列合并
+df1.merge(df2, on=['T','Y'])  # 默认inner合并
+df1.merge(df2, on=['T','Y'],how='outer')
+
+
+# 同merge
+df1.join(df2.set_index(['T','Y']),on=['T','Y'],how='inner')
+df1.join(df2.set_index(['T','Y']),on=['T','Y'],rsuffix='_df2')
 
 
 
