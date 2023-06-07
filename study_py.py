@@ -26,6 +26,8 @@ sheet_cu['A1'].value  #读取A1单元格内容
 
 new_sheet = book.create_sheet(title='new')  #创建sheet页
 
+# da_test.to_excel('D:/市场看板/市场/事业单&公务员位转化数据.xlsx',sheet_name=week)
+
 rows = dataframe_to_rows(da_test,index=False,header=True)
 
 for r_idx, row in enumerate(rows, 1):
@@ -363,6 +365,7 @@ dts[0].dt.month     #多个日期时需要用dt
 # 日期转字符串
 dt1.strftime('%Y-%m-%d')     
 dts[0].strftime('%Y-%m-%d') 
+dts.dt.strftime('%Y-%m')
 
 t = datetime.datetime.now().date()-datetime.timedelta(days=1)  # 昨日
 
@@ -438,3 +441,16 @@ pattern = re.compile(r"[\u4e00-\u9fa5]")
 pattern.findall(data_re['班级名称'][0])
 
 
+
+date_va = '2023-04.*'
+re_da['喜报日期'].str.contains(date_va)
+
+
+# 剔除不通过记录
+re_da['审核结果'].value_counts().sort_values(ascending=False)
+
+re_da2 = re_da['喜报日期'].dropna()
+
+fail = '不通过|重复|缺少'
+
+re_da2[re_da2.str.contains(fail)].index
